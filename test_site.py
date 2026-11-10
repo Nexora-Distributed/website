@@ -94,6 +94,24 @@ class SiteTests(unittest.TestCase):
         self.assertTrue(all(url.startswith(SITE_URL + "/") for url in urls))
         self.assertTrue((self.dist / ".nojekyll").exists())
 
+    def test_public_guide_omits_installation_and_uses_vector_icons(self):
+        guide = (self.dist / "get-started/index.html").read_text()
+        for withheld in ["git clone", "make full-d", "localhost:8080", "source access", 'id="evaluate"', 'data-copy=']:
+            self.assertNotIn(withheld, guide)
+        for path, doc in self.documents.items():
+            source = path.read_text()
+            for glyph in "✓☰◫⌘▥◇⚙▱⌁✳↳↗⌄":
+                self.assertNotIn(glyph, source)
+            self.assertTrue(any(attrs.get("class") == "icon" and attrs.get("aria-hidden") == "true" for _, attrs in doc.tags))
+            self.assertTrue(any(attrs.get("class") == "motion-toggle" and attrs.get("aria-pressed") == "false" for _, attrs in doc.tags))
+        for path in (self.dist / "assets").glob("*.svg"):
+            if path.name == "logo.svg":
+                continue
+            source = path.read_text()
+            self.assertIn("@keyframes flow", source)
+            self.assertIn("prefers-reduced-motion:reduce", source)
+            self.assertIn("#still:target", source)
+
     def test_structured_data_and_accessible_tabs(self):
         for path in self.documents:
             source = path.read_text()

@@ -2,6 +2,7 @@
 
 from html import escape
 from pathlib import Path
+from icons import PATHS
 
 YELLOW = "#ffcc00"
 GREEN = "#a8d5b5"
@@ -10,6 +11,11 @@ ASSETS = Path(__file__).parent / "assets"
 
 
 def text(x, y, value, size=16, color="#e9eee9", weight=400, anchor="start"):
+    symbol_icons = {'↗':'arrow','✓':'check','●':'circle','⌁':'activity','▱':'storage','✳':'spark','◫':'grid','↓':'download','+':'plus','?':'help'}
+    if value in symbol_icons:
+        offset = size if anchor == 'end' else size / 2 if anchor == 'middle' else 0
+        drawing = PATHS[symbol_icons[value]]
+        return f'<g transform="translate({x-offset} {y-size}) scale({size/24})" fill="none" stroke="{color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{drawing}"/></g>'
     return f'<text x="{x}" y="{y}" fill="{color}" font-size="{size}" font-weight="{weight}" text-anchor="{anchor}">{escape(value)}</text>'
 
 
@@ -50,7 +56,17 @@ def cylinder(x, y, label="ClickHouse", accent=False):
 
 
 def save(name, body, title):
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" role="img" aria-labelledby="title"><title id="title">{escape(title)}</title><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#9eb295" stroke-opacity=".055"/></pattern><radialGradient id="glow"><stop stop-color="#a3b76a" stop-opacity=".13"/><stop offset="1" stop-color="#151b16" stop-opacity="0"/></radialGradient></defs><rect width="960" height="640" fill="#151b16"/><rect width="960" height="640" fill="url(#grid)"/><ellipse cx="480" cy="310" rx="440" ry="290" fill="url(#glow)"/><g font-family="Arial, Helvetica, sans-serif">{body}</g></svg>'''
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" role="img" aria-labelledby="title"><title id="title">{escape(title)}</title><style>
+@keyframes flow {{ to {{ stroke-dashoffset: -140; }} }}
+@keyframes signal {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:.38; }} }}
+@keyframes draw {{ from {{ stroke-dashoffset:1100; }} to {{ stroke-dashoffset:0; }} }}
+g path[stroke-dasharray] {{ animation:flow 12s linear infinite; }}
+g circle {{ animation:signal 4s ease-in-out infinite; }}
+g circle:nth-of-type(2n) {{ animation-delay:1.2s; }}
+g path[stroke-width="3"] {{ stroke-dasharray:1100; animation:draw 3s ease-out both; }}
+#still:target ~ g * {{ animation:none!important; }}
+@media(prefers-reduced-motion:reduce) {{ * {{ animation:none!important; }} }}
+</style><g id="still"/><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#9eb295" stroke-opacity=".055"/></pattern><radialGradient id="glow"><stop stop-color="#a3b76a" stop-opacity=".13"/><stop offset="1" stop-color="#151b16" stop-opacity="0"/></radialGradient></defs><rect width="960" height="640" fill="#151b16"/><rect width="960" height="640" fill="url(#grid)"/><ellipse cx="480" cy="310" rx="440" ry="290" fill="url(#glow)"/><g font-family="Arial, Helvetica, sans-serif">{body}</g></svg>'''
     (ASSETS / f"{name}.svg").write_text(svg, encoding="utf-8")
 
 

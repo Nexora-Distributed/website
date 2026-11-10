@@ -46,18 +46,6 @@ document.querySelectorAll('[role="tablist"]').forEach((list) => {
     });
   });
 });
-document.querySelectorAll('[data-copy]').forEach((button) => {
-  button.addEventListener('click', async () => {
-    const text = document.getElementById(button.dataset.copy).textContent;
-    const status = button.closest('.command-block').querySelector('[role="status"]');
-    try {
-      await navigator.clipboard.writeText(text);
-      status.textContent = 'Copied to clipboard';
-    } catch {
-      status.textContent = 'Select the command to copy it manually.';
-    }
-  });
-});
 const search = document.querySelector('#capability-search');
 search?.addEventListener('input', () => {
   let count = 0;
@@ -68,4 +56,18 @@ search?.addEventListener('input', () => {
     if (match) count += 1;
   });
   document.querySelector('#search-status').textContent = `${count} capabilities shown`;
+});
+
+const motionButton = document.querySelector('.motion-toggle');
+motionButton?.addEventListener('click', () => {
+  const paused = motionButton.getAttribute('aria-pressed') !== 'true';
+  motionButton.setAttribute('aria-pressed', String(paused));
+  motionButton.setAttribute('aria-label', paused ? 'Resume illustration animations' : 'Pause illustration animations');
+  motionButton.querySelector('span').textContent = paused ? 'Resume motion' : 'Pause motion';
+  document.documentElement.classList.toggle('motion-paused', paused);
+  document.querySelectorAll('img[src*=".svg"]').forEach((image) => {
+    const url = new URL(image.src);
+    url.hash = paused ? 'still' : '';
+    image.src = url.href;
+  });
 });
