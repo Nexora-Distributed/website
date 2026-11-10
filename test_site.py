@@ -1,5 +1,6 @@
 """Validate the complete static artifact, including project-URL navigation."""
 
+import hashlib
 import json
 import unittest
 import xml.etree.ElementTree as ET
@@ -76,6 +77,9 @@ class SiteTests(unittest.TestCase):
                     if target.path.endswith("/"):
                         local /= "index.html"
                     self.assertTrue(local.is_file(), f"missing target {local}")
+                    if "/assets/" in target.path:
+                        version = hashlib.sha256(local.read_bytes()).hexdigest()[:12]
+                        self.assertEqual(target.query, f"v={version}")
                     if target.fragment:
                         self.assertIn(local, self.documents)
                         self.assertIn(target.fragment, [a.get("id") for _, a in self.documents[local].tags])

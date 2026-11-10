@@ -1,8 +1,10 @@
 """Build the standalone GitHub Pages website with the Python standard library."""
 
 import argparse
+import hashlib
 import json
 import os
+import re
 import shutil
 from html import escape
 from pathlib import Path
@@ -45,11 +47,16 @@ def render(slug, page, site_url, root=None):
         ("Start here", [("get-started/", "Getting started"), ("get-started/#mcp", "MCP workflows"), ("get-started/#questions", "Common questions")]),
     ])
     schema = json.dumps({"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Nexora", "applicationCategory": "DeveloperApplication", "operatingSystem": "Docker, Kubernetes", "url": site_url + "/", "description": PAGES[""]["description"]}).replace("<", "\\u003c")
-    return f'''<!doctype html>
+    html = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{title}</title><meta name="description" content="{description}"><meta name="theme-color" content="#151b16"><link rel="canonical" href="{canonical}"><link rel="icon" type="image/svg+xml" href="@root@assets/logo.svg"><meta property="og:type" content="website"><meta property="og:site_name" content="Nexora"><meta property="og:title" content="{title}"><meta property="og:description" content="{description}"><meta property="og:url" content="{canonical}"><meta name="twitter:card" content="summary"><link rel="stylesheet" href="@root@assets/site.css"><script src="@root@assets/site.js" defer></script><script type="application/ld+json">{schema}</script></head>
 <body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href="@root@" aria-label="Nexora home"><img src="@root@assets/logo.svg" alt="" width="36" height="36"><span>nexora<span class="brand-dot">.</span></span></a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation" type="button">Menu <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span></button><nav id="navigation" aria-label="Main navigation"><details class="nav-product"><summary>Product <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="product-menu">{product_links}</div></details>{top_links}<a class="nav-cta" href="@root@get-started/">Get started <span aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></nav></div></header>
 <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause illustration animations">{icon("pause")}<span>Pause motion</span></button><main id="main">{hero}{page['body']}<section class="closing-cta"><div><p class="eyebrow">YOUR NEXT CLEAR STEP</p><h2>Get closer to<br>your ClickHouse.</h2></div><div><p>Bring your fleet, your questions, and your operational work into one place.</p>{link('get-started/', 'Start with Nexora', 'button dark-button')}</div></section></main>
-<footer class="site-footer"><div class="footer-main"><div class="footer-brand"><a class="brand" href="@root@"><img src="@root@assets/logo.svg" alt="" width="36" height="36"><span>nexora<span class="brand-dot">.</span></span></a><p>The ops architect<br>beside ClickHouse.</p></div>{footer_groups}</div><div class="footer-bottom"><span>© 2026 Nexora</span><p>Built for the people behind the database.</p><span>ClickHouse is a trademark of ClickHouse, Inc.</span></div></footer></body></html>'''.replace('@root@', root)
+<footer class="site-footer"><div class="footer-main"><div class="footer-brand"><a class="brand" href="@root@"><img src="@root@assets/logo.svg" alt="" width="36" height="36"><span>nexora<span class="brand-dot">.</span></span></a><p>The ops architect<br>beside ClickHouse.</p></div>{footer_groups}</div><div class="footer-bottom"><span>© 2026 Nexora</span><p>Built for the people behind the database.</p><span>ClickHouse is a trademark of ClickHouse, Inc.</span></div></footer></body></html>'''
+
+    # Content versions prevent a new page from loading cached assets from an older release.
+    return re.sub(r'@root@assets/([^"<>]+)', lambda match: (
+        f"@root@assets/{match[1]}?v={hashlib.sha256((HERE / 'assets' / match[1]).read_bytes()).hexdigest()[:12]}"
+    ), html).replace('@root@', root)
 
 
 def build(site_url):
