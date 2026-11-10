@@ -57,17 +57,3 @@ search?.addEventListener('input', () => {
   });
   document.querySelector('#search-status').textContent = `${count} capabilities shown`;
 });
-
-const motionButton = document.querySelector('.motion-toggle');
-motionButton?.addEventListener('click', () => {
-  const paused = motionButton.getAttribute('aria-pressed') !== 'true';
-  motionButton.setAttribute('aria-pressed', String(paused));
-  motionButton.setAttribute('aria-label', paused ? 'Resume illustration animations' : 'Pause illustration animations');
-  motionButton.querySelector('span').textContent = paused ? 'Resume motion' : 'Pause motion';
-  document.documentElement.classList.toggle('motion-paused', paused);
-  document.querySelectorAll('img[src*=".svg"]').forEach((image) => {
-    const url = new URL(image.src);
-    url.hash = paused ? 'still' : '';
-    image.src = url.href;
-  });
-});

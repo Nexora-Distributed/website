@@ -23,12 +23,9 @@
 .small-check .icon,.tool-line .icon{width:13px;height:13px}
 .integration-symbol .icon{width:32px;height:32px}
 .check-list li>.icon{position:absolute;left:0;top:12px;width:15px;height:15px;color:var(--yellow)}
-.motion-toggle{display:none;position:fixed;z-index:25;bottom:18px;right:20px;align-items:center;gap:8px;border:1px solid #627052;border-radius:24px;padding:10px 15px;background:#20291ff2;color:#ecf0e5;font-size:11px;box-shadow:0 5px 20px #0003}
-.js .motion-toggle{display:flex}.motion-toggle .icon{width:13px;height:13px}
 .art-frame{transition:border-color .3s,box-shadow .3s}.art-frame:hover{border-color:#91a36f;box-shadow:0 12px 40px #0002}
 .feature-card .text-link{transition:gap .2s}.feature-card:hover .text-link{gap:32px}
 .directory article{transition:background .2s}.directory article:hover{background:#dce3ce44}
 .product-menu a{transition:background .18s}.guide-nav a{padding:6px 0}
-@media(max-width:780px){#navigation.is-open{max-height:calc(100dvh - 95px);overflow-y:auto;overscroll-behavior:contain}.hero-lede{line-height:1.85}.guide-content>section{scroll-margin-top:85px}.motion-toggle{bottom:12px;right:12px;padding:9px 12px;font-size:10px}.art-frame figcaption{font-size:11px}}
-@media(prefers-reduced-motion:reduce){.js .motion-toggle{display:none}.art-frame,.icon,.feature-card .text-link{transition:none}}
-.motion-paused *{animation-play-state:paused!important}
+@media(max-width:780px){#navigation.is-open{max-height:calc(100dvh - 95px);overflow-y:auto;overscroll-behavior:contain}.hero-lede{line-height:1.85}.guide-content>section{scroll-margin-top:85px}.art-frame figcaption{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.art-frame,.icon,.feature-card .text-link{transition:none}}

@@ -23,8 +23,8 @@ jobs:
           python-version: '3.12'
       - name: Validate pages, links, metadata, and illustrations
         run: python test_site.py
-      - name: Validate motion controls
-        run: node --check assets/site.js && node test_motion.cjs
+      - name: Validate browser JavaScript
+        run: node --check assets/site.js
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
         id: pages

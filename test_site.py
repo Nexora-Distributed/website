@@ -107,7 +107,8 @@ class SiteTests(unittest.TestCase):
             for glyph in "✓☰◫⌘▥◇⚙▱⌁✳↳↗⌄":
                 self.assertNotIn(glyph, source)
             self.assertTrue(any(attrs.get("class") == "icon" and attrs.get("aria-hidden") == "true" for _, attrs in doc.tags))
-            self.assertTrue(any(attrs.get("class") == "motion-toggle" and attrs.get("aria-pressed") == "false" for _, attrs in doc.tags))
+            self.assertNotIn("motion-toggle", source)
+            self.assertNotIn("Pause motion", source)
         for path in (self.dist / "assets").glob("*.svg"):
             if path.name == "logo.svg":
                 continue
